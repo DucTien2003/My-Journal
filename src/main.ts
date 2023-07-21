@@ -14,5 +14,7 @@ app.use(antd);
 registerGlobalComponent(app);
 
 app.use(router);
-await router.isReady();
+(async () => {
+  await router.isReady();
+})();
 app.mount("#app");
