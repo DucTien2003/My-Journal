@@ -64,7 +64,7 @@ const resetModal = () => {
     title="Change password"
     :okButtonProps="{ hidden: true }"
     :cancelButtonProps="{ hidden: true }"
-    @cancel="resetModal"
+    @cancel="handleCancel"
     :footer="null"
   >
     <a-form
