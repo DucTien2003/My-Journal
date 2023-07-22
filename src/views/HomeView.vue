@@ -18,7 +18,7 @@ const filterValue = ref<Dayjs>();
 // };
 
 const getStatusUrl = (status: string) => {
-  return `/src/assets/icons/imotions/imotion${status}.svg`;
+  return `/assets/icons/imotions/imotion${status}.svg`;
 };
 
 const entriesOfYears = reactive<EntriesOfYear[]>([
