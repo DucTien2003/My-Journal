@@ -106,6 +106,7 @@ const entriesOfYears = reactive<EntriesOfYear[]>([
           v-model:value="filterValue"
           :picker="filter"
           class="w-40"
+          inputReadOnly="true"
         />
 
         <a-select
