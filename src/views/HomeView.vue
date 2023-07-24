@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, reactive } from "vue";
-import type { Dayjs } from "dayjs";
+import { ref, reactive, watch } from "vue";
+import dayjs, { Dayjs } from "dayjs";
 
 import { Entry } from "../../types/entry";
 import { Filter } from "../../types/filter";
@@ -93,83 +93,106 @@ const entriesOfYears = reactive<EntriesOfYear[]>([
     ],
   },
 ]);
+
+// time entry
+const timeValue = ref<Dayjs>(dayjs("08:00", "HH:mm"));
+
+watch(timeValue, () => {
+  console.log(timeValue.value);
+});
 </script>
 
 <template>
-  <div class="mt-4 px-4">
-    <!-- filter -->
-    <div class="flex items-center justify-between">
-      <span class="font-medium text-lg color">Tìm kiếm</span>
+  <div class="mt-4 lg:flex">
+    <!-- List entries -->
+    <div class="px-4 lg:w-1/3">
+      <!-- filter -->
+      <div class="flex items-center justify-between justify-end">
+        <span class="font-medium text-lg color lg:hidden">Tìm kiếm</span>
 
-      <div>
-        <a-date-picker
-          v-model:value="filterValue"
-          :picker="filter"
-          class="w-40"
-          inputReadOnly="true"
-        />
+        <div class="lg:flex lg:w-full">
+          <a-date-picker
+            v-model:value="filterValue"
+            :picker="filter"
+            class="w-40 lg:flex-1"
+            :inputReadOnly="true"
+          />
 
-        <a-select
-          v-model:value="filter"
-          class="w-24 ml-1"
-        >
-          <a-select-option value="">Day</a-select-option>
-          <a-select-option value="week">Week</a-select-option>
-          <a-select-option value="month">Month</a-select-option>
-          <a-select-option value="quarter">Quarter</a-select-option>
-          <a-select-option value="year">Year</a-select-option>
-        </a-select>
+          <a-select
+            v-model:value="filter"
+            class="w-24 ml-1"
+          >
+            <a-select-option value="">Day</a-select-option>
+            <a-select-option value="week">Week</a-select-option>
+            <a-select-option value="month">Month</a-select-option>
+            <a-select-option value="quarter">Quarter</a-select-option>
+            <a-select-option value="year">Year</a-select-option>
+          </a-select>
+        </div>
       </div>
-    </div>
 
-    <!-- content -->
-    <div class="content mt-3 overflow-auto">
-      <div
-        v-for="(entriesOfYear, index) in entriesOfYears"
-        :key="index"
-      >
-        <a-divider orientation="left">
-          <span class="text-xl">{{ entriesOfYear.year }}</span>
-        </a-divider>
-
+      <!-- entries -->
+      <div class="entries mt-3 overflow-auto">
         <div
-          v-for="(entry, index) in entriesOfYear.entries"
-          class="color-bg-entry flex p-2 rounded-md mb-3"
+          v-for="(entriesOfYear, index) in entriesOfYears"
           :key="index"
         >
-          <div class="flex items-center">
-            <div class="flex flex-col items-center w-16">
-              <div class="flex items-center justify-between w-full">
-                <img
-                  :src="getStatusUrl(entry.status)"
-                  alt="icon"
-                  class="w-7"
-                />
+          <a-divider orientation="left">
+            <span class="text-xl">{{ entriesOfYear.year }}</span>
+          </a-divider>
 
-                <div class="text-xs">{{ entry.month }}</div>
+          <div
+            v-for="(entry, index) in entriesOfYear.entries"
+            class="color-bg-entry flex p-2 rounded-md mb-3"
+            :key="index"
+          >
+            <div class="flex items-center">
+              <div class="flex flex-col items-center w-16">
+                <div class="flex items-center justify-between w-full">
+                  <img
+                    :src="getStatusUrl(entry.status)"
+                    alt="icon"
+                    class="w-7"
+                  />
+
+                  <div class="text-xs">{{ entry.month }}</div>
+                </div>
+                <div class="text-2xl font-semibold">{{ entry.dayMonth }}</div>
+                <div class="text-sm">{{ entry.dayWeek }}</div>
               </div>
-              <div class="text-2xl font-semibold">{{ entry.dayMonth }}</div>
-              <div class="text-sm">{{ entry.dayWeek }}</div>
+
+              <a-divider
+                type="vertical"
+                class="h-20"
+              />
             </div>
 
-            <a-divider
-              type="vertical"
-              class="h-20"
-            />
-          </div>
-
-          <div class="flex flex-col flex-1">
-            <div
-              class="limited-line-1 text-lg"
-              title="Header Header Header Header Header Header"
-            >
-              {{ entry.header }}
-            </div>
-            <div class="limited-line-2 text-sm mt-1">
-              {{ entry.content }}
+            <div class="flex flex-col flex-1">
+              <div
+                class="limited-line-1 text-lg"
+                title="Header Header Header Header Header Header"
+              >
+                {{ entry.header }}
+              </div>
+              <div class="limited-line-2 text-sm mt-1">
+                {{ entry.content }}
+              </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Detail entry -->
+    <div class="mr-4 flex-1 hidden lg:block">
+      <div class="detail-entry bg-white p-3 w-11/12 h-full m-auto">
+        <a-time-picker
+          v-model:value="timeValue"
+          format="HH:mm"
+          value-format="HH:mm"
+          :inputReadOnly="true"
+          :allowClear="false"
+        />
       </div>
     </div>
   </div>
@@ -194,7 +217,7 @@ const entriesOfYears = reactive<EntriesOfYear[]>([
   -webkit-box-orient: vertical;
 }
 
-.content {
+.entries {
   height: calc(100vh - 150px);
 }
 </style>

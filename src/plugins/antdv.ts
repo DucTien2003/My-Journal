@@ -29,6 +29,7 @@ import {
   Tooltip,
   TreeSelect,
   Table,
+  TimePicker,
   Select,
   Divider,
 } from "ant-design-vue";
@@ -69,5 +70,6 @@ export const antd = (app: App<Element>) => {
     .use(Select)
     .use(Divider)
     .use(Table)
+    .use(TimePicker)
     .use(Checkbox);
 };
