@@ -1,10 +1,8 @@
+import { Dayjs } from "dayjs";
+
 export interface Entry {
-  status: string;
-  time: string;
-  dayMonth: string;
-  dayWeek: string;
-  month: string;
-  year: number;
-  header: string;
+  emotion: number;
+  time: Dayjs;
+  title: string;
   content: string;
 }

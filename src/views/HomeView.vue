@@ -1,223 +1,75 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from "vue";
+import { ref, reactive } from "vue";
 import dayjs, { Dayjs } from "dayjs";
 
-import { Entry } from "../../types/entry";
-import { Filter } from "../../types/filter";
+import { Entry, EntriesOfYear } from "../../types";
+import { getEntriesOfYears } from "@/api";
+import { getDate } from "@/utils";
+import EntryList from "@/components/entry/EntryList.vue";
+import EntryDetail from "@/components/entry/EntryDetail.vue";
 
-interface EntriesOfYear {
-  year: number;
-  entries: Entry[] | [];
-}
+// Entries data
+const entriesOfYears = reactive<EntriesOfYear[]>(getEntriesOfYears());
 
-const filter = ref<Filter>("");
-const filterValue = ref<Dayjs>();
-
-// const showTime = () => {
-//   console.log(filterValue.value);
-// };
-
-const getStatusUrl = (status: string) => {
-  return `/assets/icons/imotions/imotion${status}.svg`;
+const handleShowEntryDetail = (entry: Entry, index: number, year: number) => {
+  isShowDetail.value = true;
+  dateValue.value = entry.time;
+  if (entry.time.year() === year) {
+    selected.value = index + 1;
+  }
 };
 
-const entriesOfYears = reactive<EntriesOfYear[]>([
-  {
-    year: 2018,
-    entries: [
-      {
-        status: "1",
-        time: "10:57",
-        dayMonth: "20",
-        dayWeek: "Wed",
-        month: "Jul",
-        year: 2018,
-        header: "hello world",
-        content: "this is first entry",
-      },
-      {
-        status: "5",
-        time: "03:04",
-        dayMonth: "04",
-        dayWeek: "fri",
-        month: "Apr",
-        year: 2018,
-        header: "hello world",
-        content: "this is first entry",
-      },
-      {
-        status: "5",
-        time: "10:57",
-        dayMonth: "10",
-        dayWeek: "fri",
-        month: "Sep",
-        year: 2018,
-        header: "hello world",
-        content: "this is first entry",
-      },
-    ],
-  },
-  {
-    year: 2016,
-    entries: [
-      {
-        status: "3",
-        time: "10:57",
-        dayMonth: "20",
-        dayWeek: "fri",
-        month: "Dec",
-        year: 2016,
-        header: "hello world",
-        content: "this is first entry",
-      },
-      {
-        status: "4",
-        time: "03:04",
-        dayMonth: "04",
-        dayWeek: "fri",
-        month: "Jan",
-        year: 2016,
-        header: "hello world",
-        content: "this is first entry",
-      },
-      {
-        status: "2",
-        time: "10:57",
-        dayMonth: "10",
-        dayWeek: "fri",
-        month: "Feb",
-        year: 2016,
-        header: "hello world",
-        content: "this is first entry",
-      },
-    ],
-  },
-]);
+// Handle selected
+const selected = ref<number>(1);
 
-// time entry
-const timeValue = ref<Dayjs>(dayjs("08:00", "HH:mm"));
+// Handle click back button
+const isShowDetail = ref<Boolean>(false);
+const hiddenDetailEntry = () => {
+  isShowDetail.value = false;
+};
+const showDetailEntry = () => {
+  isShowDetail.value = true;
+};
 
-watch(timeValue, () => {
-  console.log(timeValue.value);
-});
+// Emotion
+const getEmotionUrl = (emotion: number) => {
+  return `/assets/icons/imotions/imotion${emotion}.svg`;
+};
+
+// Time
+const timeNow = dayjs();
+const dateValue = ref<Dayjs>(dayjs(getDate(timeNow)));
 </script>
 
 <template>
-  <div class="mt-4 lg:flex">
+  <div class="py-4 lg:flex h-detail">
     <!-- List entries -->
-    <div class="px-4 lg:w-1/3">
-      <!-- filter -->
-      <div class="flex items-center justify-between justify-end">
-        <span class="font-medium text-lg color lg:hidden">Tìm kiếm</span>
-
-        <div class="lg:flex lg:w-full">
-          <a-date-picker
-            v-model:value="filterValue"
-            :picker="filter"
-            class="w-40 lg:flex-1"
-            :inputReadOnly="true"
-          />
-
-          <a-select
-            v-model:value="filter"
-            class="w-24 ml-1"
-          >
-            <a-select-option value="">Day</a-select-option>
-            <a-select-option value="week">Week</a-select-option>
-            <a-select-option value="month">Month</a-select-option>
-            <a-select-option value="quarter">Quarter</a-select-option>
-            <a-select-option value="year">Year</a-select-option>
-          </a-select>
-        </div>
-      </div>
-
-      <!-- entries -->
-      <div class="entries mt-3 overflow-auto">
-        <div
-          v-for="(entriesOfYear, index) in entriesOfYears"
-          :key="index"
-        >
-          <a-divider orientation="left">
-            <span class="text-xl">{{ entriesOfYear.year }}</span>
-          </a-divider>
-
-          <div
-            v-for="(entry, index) in entriesOfYear.entries"
-            class="color-bg-entry flex p-2 rounded-md mb-3"
-            :key="index"
-          >
-            <div class="flex items-center">
-              <div class="flex flex-col items-center w-16">
-                <div class="flex items-center justify-between w-full">
-                  <img
-                    :src="getStatusUrl(entry.status)"
-                    alt="icon"
-                    class="w-7"
-                  />
-
-                  <div class="text-xs">{{ entry.month }}</div>
-                </div>
-                <div class="text-2xl font-semibold">{{ entry.dayMonth }}</div>
-                <div class="text-sm">{{ entry.dayWeek }}</div>
-              </div>
-
-              <a-divider
-                type="vertical"
-                class="h-20"
-              />
-            </div>
-
-            <div class="flex flex-col flex-1">
-              <div
-                class="limited-line-1 text-lg"
-                title="Header Header Header Header Header Header"
-              >
-                {{ entry.header }}
-              </div>
-              <div class="limited-line-2 text-sm mt-1">
-                {{ entry.content }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <entry-list
+      :data1="{
+        isShowDetail,
+        dateValue,
+        entriesOfYears,
+        getEmotionUrl,
+        handleShowEntryDetail,
+      }"
+    ></entry-list>
 
     <!-- Detail entry -->
-    <div class="mr-4 flex-1 hidden lg:block">
-      <div class="detail-entry bg-white p-3 w-11/12 h-full m-auto">
-        <a-time-picker
-          v-model:value="timeValue"
-          format="HH:mm"
-          value-format="HH:mm"
-          :inputReadOnly="true"
-          :allowClear="false"
-        />
-      </div>
-    </div>
+    <entry-detail
+      :data2="{
+        isShowDetail,
+        dateValue,
+        entriesOfYears,
+        hiddenDetailEntry,
+        showDetailEntry,
+        getEmotionUrl,
+      }"
+    ></entry-detail>
   </div>
 </template>
 
 <style scoped lang="scss">
-.color-bg-entry {
-  background-color: rgba($color: #fff9ba, $alpha: 0.7);
-}
-
-.limited-line-1 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 1; /* number of lines to show */
-  -webkit-box-orient: vertical;
-}
-
-.limited-line-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* number of lines to show */
-  -webkit-box-orient: vertical;
-}
-
-.entries {
-  height: calc(100vh - 150px);
+.h-detail {
+  height: calc(100vh - 72px);
 }
 </style>

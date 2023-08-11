@@ -1,6 +1,6 @@
 @import "./variables";
 
-//  button
+// Button
 button.ant-btn.ant-btn-primary {
   &[type="button"],
   &[type="submit"] {
@@ -13,7 +13,7 @@ button.ant-btn.ant-btn-primary {
   }
 }
 
-// form
+// Form
 .ant-form {
   & * {
     font-size: 16px !important;
@@ -24,7 +24,7 @@ button.ant-btn.ant-btn-primary {
   }
 }
 
-// modal
+// Modal
 .ant-modal-header {
   margin: 0;
   border-bottom: 1px solid #cecdcd;
@@ -52,10 +52,67 @@ button.ant-btn.ant-btn-primary {
   }
 }
 
-//diviner
+// Diviner
 .ant-divider {
   &.ant-divider-vertical {
     top: 0;
     background-color: $deviner;
+  }
+}
+
+// Time picker
+.ant-picker-ranges {
+  display: flex;
+  flex-direction: column;
+
+  .ant-picker-now {
+    text-align: center;
+    width: 100%;
+
+    .ant-picker-now-btn {
+      width: 100%;
+      border-radius: 4px;
+
+      &:hover {
+        background-color: rgba($color: $deviner, $alpha: 0.1);
+      }
+    }
+  }
+
+  .ant-picker-ok {
+    text-align: center;
+    width: 100%;
+    margin: 5px 0;
+
+    button {
+      width: 100%;
+      padding: 14px 0;
+    }
+  }
+}
+
+// Button
+.ant-btn.green-btn {
+  &.ant-btn-default {
+    color: rgb(63, 180, 106);
+    border-color: rgb(63, 180, 106);
+
+    &:hover {
+      color: rgb(73, 214, 125);
+      border-color: rgb(73, 214, 125);
+    }
+
+    &:disabled {
+      cursor: default;
+      border-color: #d9d9d9;
+      color: rgba(0, 0, 0, 0.25);
+      background-color: rgba(0, 0, 0, 0.04);
+      box-shadow: none;
+
+      &:hover {
+        color: rgba(0, 0, 0, 0.25);
+        border-color: #d9d9d9;
+      }
+    }
   }
 }
