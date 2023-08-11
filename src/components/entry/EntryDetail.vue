@@ -15,23 +15,27 @@ const props = defineProps<{
     hiddenDetailEntry: () => void;
     showDetailEntry: () => void;
     getEmotionUrl: (emotion: number) => string;
+    changeDate: (date: Dayjs) => void;
   };
 }>();
 
 // Date-Time entry
 const timeNow = dayjs();
+const dateValue = ref<Dayjs>(props.data2.dateValue);
 const timeValue = ref<Dayjs>(dayjs(getTime(timeNow), "HH:mm"));
 watch(
-  () => [props.data2.dateValue, timeValue],
+  () => [props.data2.dateValue, timeValue.value],
   () => {
+    dateValue.value = props.data2.dateValue;
     entryValue.time = dayjs(
       getDate(props.data2.dateValue) + " " + getTime(timeValue.value),
     );
   },
 );
 watch(
-  () => props.data2.dateValue,
+  () => dateValue.value,
   (newValue) => {
+    props.data2.changeDate(newValue);
     for (const entriesOfYear of props.data2.entriesOfYears) {
       if (entriesOfYear.year === newValue.year()) {
         for (const entry of entriesOfYear.entries) {
@@ -59,7 +63,6 @@ const entryValue = reactive<Entry>({
 const imotions: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 const handleChangeImotion = (emotion: number) => {
   entryValue.emotion = emotion;
-  console.log(props.data2.dateValue);
 };
 
 // Handle create entry
@@ -131,7 +134,7 @@ const handleSaveEntry = () => {
         <div class="flex justify-between items-center flex-1 mt-3 lg:mt-0">
           <div>
             <a-date-picker
-              v-model:value="data2.dateValue"
+              v-model:value="dateValue"
               :inputReadOnly="true"
               :allowClear="false"
               class="w-32"

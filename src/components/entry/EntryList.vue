@@ -12,7 +12,7 @@ defineProps<{
     dateValue: Dayjs;
     entriesOfYears: EntriesOfYear[];
     getEmotionUrl: (emotion: number) => string;
-    handleShowEntryDetail: (entry: Entry, index: number, year: number) => void;
+    handleShowEntryDetail: (entry: Entry) => void;
   };
 }>();
 
@@ -73,9 +73,7 @@ const filter = ref<Filter>("");
             getDate(entry.time) === getDate(data1.dateValue) ? 'selected' : ''
           "
           :key="indexEntry"
-          @click="
-            data1.handleShowEntryDetail(entry, indexEntry, entriesOfYear.year)
-          "
+          @click="data1.handleShowEntryDetail(entry)"
         >
           <div class="flex flex-col items-center w-16">
             <div class="flex items-center justify-between w-full">

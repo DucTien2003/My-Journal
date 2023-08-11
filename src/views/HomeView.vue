@@ -11,24 +11,17 @@ import EntryDetail from "@/components/entry/EntryDetail.vue";
 // Entries data
 const entriesOfYears = reactive<EntriesOfYear[]>(getEntriesOfYears());
 
-const handleShowEntryDetail = (entry: Entry, index: number, year: number) => {
-  isShowDetail.value = true;
-  dateValue.value = entry.time;
-  if (entry.time.year() === year) {
-    selected.value = index + 1;
-  }
-};
-
-// Handle selected
-const selected = ref<number>(1);
-
-// Handle click back button
+// Handle show entry detail
 const isShowDetail = ref<Boolean>(false);
 const hiddenDetailEntry = () => {
   isShowDetail.value = false;
 };
 const showDetailEntry = () => {
   isShowDetail.value = true;
+};
+const handleShowEntryDetail = (entry: Entry) => {
+  showDetailEntry();
+  changeDate(entry.time);
 };
 
 // Emotion
@@ -39,6 +32,9 @@ const getEmotionUrl = (emotion: number) => {
 // Time
 const timeNow = dayjs();
 const dateValue = ref<Dayjs>(dayjs(getDate(timeNow)));
+const changeDate = (date: Dayjs) => {
+  dateValue.value = date;
+};
 </script>
 
 <template>
@@ -63,6 +59,7 @@ const dateValue = ref<Dayjs>(dayjs(getDate(timeNow)));
         hiddenDetailEntry,
         showDetailEntry,
         getEmotionUrl,
+        changeDate,
       }"
     ></entry-detail>
   </div>
