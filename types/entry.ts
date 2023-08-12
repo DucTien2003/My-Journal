@@ -5,4 +5,5 @@ export interface Entry {
   time: Dayjs;
   title: string;
   content: string;
+  checked: boolean;
 }

@@ -71,6 +71,7 @@ export const getEntriesOfYears = () => {
       entries: entriesOfYear.entries.map((entry: RawEntry) => {
         return {
           ...entry,
+          checked: false,
           time: dayjs(entry.time),
         };
       }),

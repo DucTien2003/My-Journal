@@ -57,6 +57,7 @@ const entryValue = reactive<Entry>({
   time: dayjs(getDate(props.data2.dateValue) + " " + getTime(timeValue.value)),
   title: "",
   content: "",
+  checked: false,
 });
 
 // imotions
@@ -247,7 +248,7 @@ const handleSaveEntry = () => {
 
   <!-- New entry button -->
   <div
-    class="new-entry-btn flex lg:hidden"
+    class="new-entry-btn flex lg:hidden z-10"
     :class="{ hidden: data2.isShowDetail }"
     @click="createNewEntry"
   >

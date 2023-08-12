@@ -116,3 +116,18 @@ button.ant-btn.ant-btn-primary {
     }
   }
 }
+
+// Checkbox
+.ant-checkbox-wrapper {
+  .ant-checkbox-inner {
+    width: 25px;
+    height: 25px;
+    border-radius: 6px;
+
+    &::after {
+      top: 48%;
+      left: 30%;
+      transform: rotate(45deg) scale(1) translate(-50%, -50%);
+    }
+  }
+}

@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { Dayjs } from "dayjs";
+import { DeleteFilled } from "@ant-design/icons-vue";
 
 import { getDate } from "@/utils";
 
 import { Filter, EntriesOfYear, Entry } from "../../../types";
 
-defineProps<{
+const props = defineProps<{
   data1: {
     isShowDetail: Boolean;
     dateValue: Dayjs;
@@ -23,6 +24,16 @@ const filter = ref<Filter>("");
 // const showTime = () => {
 //   console.log(filterValue.value);
 // };
+
+// Delete
+let deleteAmount = 0;
+const handleChecked = (checkedValue: any) => {
+  if (checkedValue.target.checked === true) {
+    deleteAmount += 1;
+  } else {
+    deleteAmount -= 1;
+  }
+};
 </script>
 
 <template>
@@ -56,8 +67,18 @@ const filter = ref<Filter>("");
       </div>
     </div>
 
+    <!-- Actions -->
+    <div class="text-end mt-1">
+      <span
+        class="flex items-center justify-end cursor-pointer text-red-600 font-semibold hover:underline"
+      >
+        <span class="pt-1 pr-1">Delete({{ deleteAmount }})</span>
+        <delete-filled class="text-base" />
+      </span>
+    </div>
+
     <!-- Entry list -->
-    <div class="entries mt-3 overflow-auto">
+    <div class="entries mt-2 overflow-auto">
       <div
         v-for="(entriesOfYear, indexEntriesOfYear) in data1.entriesOfYears"
         :key="indexEntriesOfYear"
@@ -68,42 +89,55 @@ const filter = ref<Filter>("");
 
         <div
           v-for="(entry, indexEntry) in entriesOfYear.entries"
-          class="color-bg-entry flex p-2 rounded-md mb-3 cursor-pointer"
+          class="color-bg-entry rounded-md mb-3 cursor-pointer relative"
           :class="
             getDate(entry.time) === getDate(data1.dateValue) ? 'selected' : ''
           "
           :key="indexEntry"
-          @click="data1.handleShowEntryDetail(entry)"
         >
-          <div class="flex flex-col items-center w-16">
-            <div class="flex items-center justify-between w-full">
-              <img
-                :src="data1.getEmotionUrl(entry.emotion)"
-                alt="icon"
-                class="w-7"
-              />
-              <div class="text-xs">{{ entry.time.format("MMM") }}</div>
+          <!-- Main -->
+          <div
+            class="flex p-2"
+            @click="data1.handleShowEntryDetail(entry)"
+          >
+            <div class="flex flex-col items-center w-16">
+              <div class="flex items-center justify-between w-full">
+                <img
+                  :src="data1.getEmotionUrl(entry.emotion)"
+                  alt="icon"
+                  class="w-7"
+                />
+                <div class="text-xs">{{ entry.time.format("MMM") }}</div>
+              </div>
+
+              <div class="text-2xl font-semibold">
+                {{ entry.time.date() }}
+              </div>
+
+              <div class="text-sm">{{ entry.time.format("ddd") }}</div>
             </div>
 
-            <div class="text-2xl font-semibold">
-              {{ entry.time.date() }}
-            </div>
+            <a-divider
+              type="vertical"
+              class="h-20"
+            />
 
-            <div class="text-sm">{{ entry.time.format("ddd") }}</div>
+            <div class="flex flex-col flex-1">
+              <div class="limited-line-1 text-lg">
+                {{ entry.title }}
+              </div>
+              <div class="limited-line-2 text-sm mt-1">
+                {{ entry.content }}
+              </div>
+            </div>
           </div>
 
-          <a-divider
-            type="vertical"
-            class="h-20"
-          />
-
-          <div class="flex flex-col flex-1">
-            <div class="limited-line-1 text-lg">
-              {{ entry.title }}
-            </div>
-            <div class="limited-line-2 text-sm mt-1">
-              {{ entry.content }}
-            </div>
+          <!-- Select box -->
+          <div class="absolute top-0 right-0 mr-2 mt-1">
+            <a-checkbox
+              @change="handleChecked"
+              v-model:checked="entry.checked"
+            ></a-checkbox>
           </div>
         </div>
       </div>
@@ -135,6 +169,6 @@ const filter = ref<Filter>("");
 }
 
 .entries {
-  height: calc(100vh - 150px);
+  height: calc(100vh - 176px);
 }
 </style>
