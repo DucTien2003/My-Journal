@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { Dayjs } from "dayjs";
 import { DeleteFilled } from "@ant-design/icons-vue";
 
@@ -7,7 +7,7 @@ import { getDate } from "@/utils";
 
 import { Filter, EntriesOfYear, Entry } from "../../../types";
 
-const props = defineProps<{
+defineProps<{
   data1: {
     isShowDetail: Boolean;
     dateValue: Dayjs;
@@ -68,9 +68,9 @@ const handleChecked = (checkedValue: any) => {
     </div>
 
     <!-- Actions -->
-    <div class="text-end mt-1">
+    <div class="mt-1 flex justify-end">
       <span
-        class="flex items-center justify-end cursor-pointer text-red-600 font-semibold hover:underline"
+        class="flex items-center cursor-pointer text-red-600 font-semibold hover:underline"
       >
         <span class="pt-1 pr-1">Delete({{ deleteAmount }})</span>
         <delete-filled class="text-base" />
