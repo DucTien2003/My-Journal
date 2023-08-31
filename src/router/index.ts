@@ -49,6 +49,30 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       layout: "default-layout",
     },
+    children: [
+      {
+        path: "",
+        name: "entry-list",
+        component: () =>
+          import(
+            /* webpackChunkName: "entry-list" */ "../components/entry/EntryList.vue"
+          ),
+        meta: {
+          layout: "default-layout",
+        },
+      },
+      {
+        path: "/entry-detail",
+        name: "entry-detail",
+        component: () =>
+          import(
+            /* webpackChunkName: "entry-detail" */ "../components/entry/EntryDetail.vue"
+          ),
+        meta: {
+          layout: "default-layout",
+        },
+      },
+    ],
   },
 ];
 

@@ -3,29 +3,31 @@ import { ref } from "vue";
 import { Dayjs } from "dayjs";
 import { DeleteFilled } from "@ant-design/icons-vue";
 
-import { getDate } from "@/utils";
+import { Entry, Filter } from "../../../types";
 
-import { Filter, EntriesOfYear, Entry } from "../../../types";
+import { useEntryStore } from "@/stores";
+import { getDate, isDesktop } from "@/utils";
 
-defineProps<{
-  data1: {
-    isShowDetail: Boolean;
-    dateValue: Dayjs;
-    entriesOfYears: EntriesOfYear[];
-    getEmotionUrl: (emotion: number) => string;
-    handleShowEntryDetail: (entry: Entry) => void;
-  };
-}>();
+const entryStore = useEntryStore();
 
 // Filter
 const filterValue = ref<Dayjs>();
 const filter = ref<Filter>("");
-
 // const showTime = () => {
 //   console.log(filterValue.value);
 // };
 
-// Delete
+// Emotion
+const getEmotionUrl = (emotion: number) => {
+  return `/assets/icons/emotions/emotion${emotion}.svg`;
+};
+
+// Show entry detail
+const handleShowEntryDetail = (entry: Entry) => {
+  entryStore.changeDate(entry.time);
+};
+
+// Delete entry
 let deleteAmount = 0;
 const handleChecked = (checkedValue: any) => {
   if (checkedValue.target.checked === true) {
@@ -34,14 +36,15 @@ const handleChecked = (checkedValue: any) => {
     deleteAmount -= 1;
   }
 };
+const handleDeleteEntry = () => {
+  entryStore.deleteEntry();
+  deleteAmount = 0;
+};
 </script>
 
 <template>
   <!-- List entries -->
-  <div
-    class="px-4 lg:w-1/3 relative lg:block"
-    :class="{ hidden: data1.isShowDetail }"
-  >
+  <div class="px-4 lg:w-1/3 relative">
     <!-- Filter -->
     <div class="flex items-center justify-between">
       <span class="font-medium text-lg color lg:hidden">Tìm kiếm</span>
@@ -71,6 +74,7 @@ const handleChecked = (checkedValue: any) => {
     <div class="mt-1 flex justify-end">
       <span
         class="flex items-center cursor-pointer text-red-600 font-semibold hover:underline"
+        @click="handleDeleteEntry"
       >
         <span class="pt-1 pr-1">Delete({{ deleteAmount }})</span>
         <delete-filled class="text-base" />
@@ -80,7 +84,7 @@ const handleChecked = (checkedValue: any) => {
     <!-- Entry list -->
     <div class="entries mt-2 overflow-auto">
       <div
-        v-for="(entriesOfYear, indexEntriesOfYear) in data1.entriesOfYears"
+        v-for="(entriesOfYear, indexEntriesOfYear) in entryStore.entriesOfYears"
         :key="indexEntriesOfYear"
       >
         <a-divider orientation="left">
@@ -91,19 +95,26 @@ const handleChecked = (checkedValue: any) => {
           v-for="(entry, indexEntry) in entriesOfYear.entries"
           class="color-bg-entry rounded-md mb-3 cursor-pointer relative"
           :class="
-            getDate(entry.time) === getDate(data1.dateValue) ? 'selected' : ''
+            getDate(entry.time) === getDate(entryStore.dateValue)
+              ? 'selected'
+              : ''
           "
           :key="indexEntry"
         >
           <!-- Main -->
-          <div
+          <component
+            :is="isDesktop ? 'div' : 'router-link'"
+            :to="{
+              name: 'entry-detail',
+              params: {},
+            }"
             class="flex p-2"
-            @click="data1.handleShowEntryDetail(entry)"
+            @click="handleShowEntryDetail(entry)"
           >
             <div class="flex flex-col items-center w-16">
               <div class="flex items-center justify-between w-full">
                 <img
-                  :src="data1.getEmotionUrl(entry.emotion)"
+                  :src="getEmotionUrl(entry.emotion)"
                   alt="icon"
                   class="w-7"
                 />
@@ -130,7 +141,7 @@ const handleChecked = (checkedValue: any) => {
                 {{ entry.content }}
               </div>
             </div>
-          </div>
+          </component>
 
           <!-- Select box -->
           <div class="absolute top-0 right-0 mr-2 mt-1">

@@ -3,40 +3,59 @@ import { ref, watch, reactive } from "vue";
 import { LeftOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import dayjs, { Dayjs } from "dayjs";
 import { message } from "ant-design-vue";
+import { useRouter } from "vue-router";
+
+import { Entry } from "../../../types";
 
 import { extend, getDate, getTime } from "@/utils";
-import { EntriesOfYear, Entry } from "../../../types";
+import { useEntryStore } from "@/stores";
 
-const props = defineProps<{
-  data2: {
-    isShowDetail: Boolean;
-    dateValue: Dayjs;
-    entriesOfYears: EntriesOfYear[];
-    hiddenDetailEntry: () => void;
-    showDetailEntry: () => void;
-    getEmotionUrl: (emotion: number) => string;
-    changeDate: (date: Dayjs) => void;
-  };
-}>();
+const entryStore = useEntryStore();
 
-// Date-Time entry
+// Time entry
 const timeNow = dayjs();
-const dateValue = ref<Dayjs>(props.data2.dateValue);
 const timeValue = ref<Dayjs>(dayjs(getTime(timeNow), "HH:mm"));
+
+// Entry
+const entryValue = reactive<Entry>({
+  emotion: 1,
+  time: dayjs(getDate(entryStore.dateValue) + " " + getTime(timeValue.value)),
+  title: "",
+  content: "",
+  checked: false,
+});
+
+const dateValue = ref<Dayjs>(entryStore.dateValue);
+for (const entriesOfYear of entryStore.entriesOfYears) {
+  if (entriesOfYear.year === dateValue.value.year()) {
+    for (const entry of entriesOfYear.entries) {
+      if (getDate(entry.time) === getDate(dateValue.value)) {
+        extend(entryValue, entry);
+        timeValue.value = entry.time;
+        break;
+      }
+    }
+    break;
+  }
+}
+
+// Change entryValue.time
 watch(
-  () => [props.data2.dateValue, timeValue.value],
+  () => [entryStore.dateValue, timeValue.value],
   () => {
-    dateValue.value = props.data2.dateValue;
+    dateValue.value = entryStore.dateValue;
     entryValue.time = dayjs(
-      getDate(props.data2.dateValue) + " " + getTime(timeValue.value),
+      getDate(entryStore.dateValue) + " " + getTime(timeValue.value),
     );
   },
 );
+
+// Check dateValue has entry yet?
 watch(
   () => dateValue.value,
   (newValue) => {
-    props.data2.changeDate(newValue);
-    for (const entriesOfYear of props.data2.entriesOfYears) {
+    entryStore.changeDate(newValue);
+    for (const entriesOfYear of entryStore.entriesOfYears) {
       if (entriesOfYear.year === newValue.year()) {
         for (const entry of entriesOfYear.entries) {
           if (getDate(entry.time) === getDate(newValue)) {
@@ -51,33 +70,26 @@ watch(
   },
 );
 
-// Entry
-const entryValue = reactive<Entry>({
-  emotion: 1,
-  time: dayjs(getDate(props.data2.dateValue) + " " + getTime(timeValue.value)),
-  title: "",
-  content: "",
-  checked: false,
-});
-
-// imotions
-const imotions: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
-const handleChangeImotion = (emotion: number) => {
+// Emotion
+const emotions: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
+const handleChangeEmotion = (emotion: number) => {
   entryValue.emotion = emotion;
+};
+const getEmotionUrl = (emotion: number) => {
+  return `/assets/icons/emotions/emotion${emotion}.svg`;
 };
 
 // Handle create entry
 const createNewEntry = () => {
-  props.data2.showDetailEntry();
   entryValue.emotion = 1;
   timeValue.value = dayjs(getTime(timeNow), "HH:mm");
-  props.data2.dateValue = dayjs(getDate(timeNow));
+  entryStore.dateValue = dayjs(getDate(timeNow));
   entryValue.title = "";
   entryValue.content = "";
-  for (const entriesOfYear of props.data2.entriesOfYears) {
-    if (entriesOfYear.year === props.data2.dateValue.year()) {
+  for (const entriesOfYear of entryStore.entriesOfYears) {
+    if (entriesOfYear.year === entryStore.dateValue.year()) {
       for (const entry of entriesOfYear.entries) {
-        if (getDate(entry.time) === getDate(props.data2.dateValue)) {
+        if (getDate(entry.time) === getDate(entryStore.dateValue)) {
           message.info("There is 1 record for today.", 3);
           break;
         }
@@ -89,42 +101,20 @@ const createNewEntry = () => {
 
 // Handle save
 const handleSaveEntry = () => {
-  let checkYear = true;
-  let checkDate = true;
-  for (const entriesOfYear of props.data2.entriesOfYears) {
-    if (entriesOfYear.year === entryValue.time.year()) {
-      checkYear = false;
-      for (const entry of entriesOfYear.entries) {
-        if (getDate(entry.time) === getDate(entryValue.time)) {
-          checkDate = false;
-          extend(entry, entryValue);
-          message.success("Save successfully!", 3);
-          break;
-        }
-      }
-      if (checkDate) {
-        message.success("Save successfully!", 3);
-        entriesOfYear.entries.unshift({ ...entryValue });
-      }
-      break;
-    }
-  }
-  if (checkYear) {
-    props.data2.entriesOfYears.unshift({
-      year: entryValue.time.year(),
-      entries: [{ ...entryValue }],
-    });
-  }
+  entryStore.saveEntry(entryValue);
   console.log(entryValue);
+};
+
+// Handle click back-btn
+const router = useRouter();
+const handleBackToList = () => {
+  router.go(-1);
 };
 </script>
 
 <template>
   <!-- Detail entry -->
-  <div
-    class="flex-1 lg:mr-4 lg:block h-full"
-    :class="{ hidden: !data2.isShowDetail }"
-  >
+  <div class="flex-1 lg:mr-4 h-full">
     <div
       class="flex flex-col detail-entry bg-white p-3 pt-2 w-11/12 h-full m-auto overflow-auto"
     >
@@ -155,26 +145,26 @@ const handleSaveEntry = () => {
             placement="bottomRight"
           >
             <div
-              class="imotion-icon rounded cursor-pointer"
+              class="emotion-icon rounded cursor-pointer"
               title="Your emotion"
             >
               <img
-                :src="data2.getEmotionUrl(entryValue.emotion)"
-                alt="imotion"
+                :src="getEmotionUrl(entryValue.emotion)"
+                alt="emotion"
                 class="w-10"
               />
             </div>
             <template #overlay>
               <a-menu class="grid grid-flow-row grid-cols-4">
                 <a-menu-item
-                  v-for="(imotion, index) in imotions"
+                  v-for="(emotion, index) in emotions"
                   :key="index"
-                  @click="handleChangeImotion(imotion)"
+                  @click="handleChangeEmotion(emotion)"
                   class=""
                 >
                   <img
-                    :src="data2.getEmotionUrl(imotion)"
-                    alt="imotion"
+                    :src="getEmotionUrl(emotion)"
+                    alt="emotion"
                     class="w-10"
                   />
                 </a-menu-item>
@@ -193,7 +183,7 @@ const handleSaveEntry = () => {
           <div class="flex justify-between flex-1">
             <a-button
               class="font-bold lg:hidden"
-              @click="data2.hiddenDetailEntry()"
+              @click="handleBackToList"
             >
               <div class="flex items-center justify-center">
                 <left-outlined />
@@ -249,7 +239,6 @@ const handleSaveEntry = () => {
   <!-- New entry button -->
   <div
     class="new-entry-btn flex lg:hidden z-10"
-    :class="{ hidden: data2.isShowDetail }"
     @click="createNewEntry"
   >
     <plus-outlined class="rotate-45" />
@@ -257,7 +246,7 @@ const handleSaveEntry = () => {
 </template>
 
 <style scoped lang="scss">
-.imotion-icon {
+.emotion-icon {
   padding: 5px 12px;
 
   &:hover {
