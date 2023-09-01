@@ -7,7 +7,7 @@ import { useRouter } from "vue-router";
 
 import { Entry } from "../../../types";
 
-import { extend, getDate, getTime } from "@/utils";
+import { extend, getDate, getTime, isDesktop } from "@/utils";
 import { useEntryStore } from "@/stores";
 
 const entryStore = useEntryStore();
@@ -25,19 +25,24 @@ const entryValue = reactive<Entry>({
   checked: false,
 });
 
-const dateValue = ref<Dayjs>(entryStore.dateValue);
-for (const entriesOfYear of entryStore.entriesOfYears) {
-  if (entriesOfYear.year === dateValue.value.year()) {
-    for (const entry of entriesOfYear.entries) {
-      if (getDate(entry.time) === getDate(dateValue.value)) {
-        extend(entryValue, entry);
-        timeValue.value = entry.time;
-        break;
+// Change entryValue according to dateValue
+const changeEntryValue = (dateValue: Dayjs) => {
+  for (const entriesOfYear of entryStore.entriesOfYears) {
+    if (entriesOfYear.year === dateValue.year()) {
+      for (const entry of entriesOfYear.entries) {
+        if (getDate(entry.time) === getDate(dateValue)) {
+          extend(entryValue, entry);
+          timeValue.value = entry.time;
+          break;
+        }
       }
+      break;
     }
-    break;
   }
-}
+};
+
+const dateValue = ref<Dayjs>(entryStore.dateValue);
+changeEntryValue(dateValue.value);
 
 // Change entryValue.time
 watch(
@@ -55,18 +60,7 @@ watch(
   () => dateValue.value,
   (newValue) => {
     entryStore.changeDate(newValue);
-    for (const entriesOfYear of entryStore.entriesOfYears) {
-      if (entriesOfYear.year === newValue.year()) {
-        for (const entry of entriesOfYear.entries) {
-          if (getDate(entry.time) === getDate(newValue)) {
-            extend(entryValue, entry);
-            timeValue.value = entry.time;
-            break;
-          }
-        }
-        break;
-      }
-    }
+    changeEntryValue(newValue);
   },
 );
 
@@ -83,7 +77,7 @@ const getEmotionUrl = (emotion: number) => {
 const createNewEntry = () => {
   entryValue.emotion = 1;
   timeValue.value = dayjs(getTime(timeNow), "HH:mm");
-  entryStore.dateValue = dayjs(getDate(timeNow));
+  entryStore.changeDate(dayjs(getDate(timeNow)));
   entryValue.title = "";
   entryValue.content = "";
   for (const entriesOfYear of entryStore.entriesOfYears) {
@@ -182,6 +176,7 @@ const handleBackToList = () => {
 
           <div class="flex justify-between flex-1">
             <a-button
+              v-if="isDesktop"
               class="font-bold lg:hidden"
               @click="handleBackToList"
             >

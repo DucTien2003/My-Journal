@@ -28,7 +28,7 @@ const onFinish = (values: any) => {
 };
 
 const onFinishFailed = (errorInfo: any) => {
-  message.error("Đổi mật khẩu thất bại", 3);
+  message.error("Change password failure", 3);
   console.log("Failed:", errorInfo);
 };
 

@@ -9,7 +9,6 @@ import { getEntriesOfYears } from "@/api";
 
 export const useEntryStore = defineStore("entry-list", {
   state: () => ({
-    // bonus
     dateValue: dayjs(getDate(dayjs())),
     // Entries data
     entriesOfYears: getEntriesOfYears(),

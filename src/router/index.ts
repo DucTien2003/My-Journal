@@ -42,7 +42,7 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/home",
+    path: "",
     name: "home",
     component: () =>
       import(/* webpackChunkName: "home" */ "../views/HomeView.vue"),
@@ -51,7 +51,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "/home/list",
+        path: "/list",
         name: "entry-list",
         component: () =>
           import(
@@ -62,7 +62,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/home/entry-detail",
+        path: "/entry-detail",
         name: "entry-detail",
         component: () =>
           import(
@@ -81,12 +81,12 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, _, next) => {
-  if (to.path === "/") {
-    next("/login");
-  } else {
-    next();
-  }
-});
+// router.beforeEach((to, _, next) => {
+//   if (to.path === "/") {
+//     next("/login");
+//   } else {
+//     next();
+//   }
+// });
 
 export default router;
