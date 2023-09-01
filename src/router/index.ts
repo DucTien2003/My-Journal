@@ -51,7 +51,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "",
+        path: "/home",
         name: "entry-list",
         component: () =>
           import(
@@ -62,7 +62,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/entry-detail",
+        path: "/home/entry-detail",
         name: "entry-detail",
         component: () =>
           import(
