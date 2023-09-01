@@ -3,7 +3,7 @@ import { reactive } from "vue";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
 
-import { requiredRule, requiredTypeRule } from "../../utils/index";
+import { requiredRule, requiredTypeRule, isDesktop } from "../../utils/index";
 
 interface FormLogin {
   email: string;
@@ -20,7 +20,11 @@ const formLogin = reactive<FormLogin>({
 const route = useRouter();
 const onFinish = (values: any) => {
   message.success("sign in successfully.", 3);
-  route.push({ name: "home" });
+  if (isDesktop.value) {
+    route.push({ name: "home" });
+  } else {
+    route.push({ name: "entry-list" });
+  }
   console.log("Success:", values);
 };
 
