@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, reactive } from "vue";
-import { LeftOutlined, PlusOutlined } from "@ant-design/icons-vue";
+import { LeftOutlined } from "@ant-design/icons-vue";
 import dayjs, { Dayjs } from "dayjs";
 import { message } from "ant-design-vue";
 import { useRouter } from "vue-router";
@@ -235,14 +235,6 @@ const handleBackToList = () => {
       />
     </div>
   </div>
-
-  <!-- New entry button -->
-  <div
-    class="new-entry-btn flex lg:hidden z-10"
-    @click="createNewEntry"
-  >
-    <plus-outlined class="rotate-45" />
-  </div>
 </template>
 
 <style scoped lang="scss">
@@ -252,19 +244,5 @@ const handleBackToList = () => {
   &:hover {
     background-color: rgba(0, 0, 0, 0.04);
   }
-}
-
-.new-entry-btn {
-  position: absolute;
-  bottom: 40px;
-  right: 40px;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  background-color: rgba($color: white, $alpha: 0.5);
-  transform: rotate(45deg);
-  font-size: 22px;
-  cursor: pointer;
 }
 </style>

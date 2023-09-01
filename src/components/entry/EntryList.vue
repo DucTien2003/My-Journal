@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { Dayjs } from "dayjs";
-import { DeleteFilled } from "@ant-design/icons-vue";
+import dayjs, { Dayjs } from "dayjs";
+import { DeleteFilled, PlusOutlined } from "@ant-design/icons-vue";
 
 import { Entry, Filter } from "../../../types";
 
@@ -39,6 +39,11 @@ const handleChecked = (checkedValue: any) => {
 const handleDeleteEntry = () => {
   entryStore.deleteEntry();
   deleteAmount = 0;
+};
+
+// click create new entry button
+const createNewEntry = () => {
+  entryStore.dateValue = dayjs(getDate(dayjs()));
 };
 </script>
 
@@ -154,6 +159,16 @@ const handleDeleteEntry = () => {
       </div>
     </div>
   </div>
+
+  <!-- New entry button -->
+  <router-link
+    v-if="!isDesktop"
+    :to="{ name: 'entry-detail', params: {} }"
+    class="new-entry-btn flex lg:hidden z-10"
+    @click="createNewEntry"
+  >
+    <plus-outlined class="rotate-45" />
+  </router-link>
 </template>
 
 <style scoped lang="scss">
@@ -181,5 +196,19 @@ const handleDeleteEntry = () => {
 
 .entries {
   height: calc(100vh - 176px);
+}
+
+.new-entry-btn {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background-color: rgba($color: white, $alpha: 0.5);
+  transform: rotate(45deg);
+  font-size: 22px;
+  cursor: pointer;
 }
 </style>
