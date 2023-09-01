@@ -16,7 +16,7 @@ const entryStore = useEntryStore();
 const timeNow = dayjs();
 const timeValue = ref<Dayjs>(dayjs(getTime(timeNow), "HH:mm"));
 
-// Entry
+// Entry (default)
 const entryValue = reactive<Entry>({
   emotion: 1,
   time: dayjs(getDate(entryStore.dateValue) + " " + getTime(timeValue.value)),
@@ -25,20 +25,21 @@ const entryValue = reactive<Entry>({
   checked: false,
 });
 
-// Change entryValue according to dateValue
-const changeEntryValue = (dateValue: Dayjs) => {
+// Change entryValue according to dateValue, return true if entryValue !== default
+const changeEntryValue = (dateValue: Dayjs): boolean => {
   for (const entriesOfYear of entryStore.entriesOfYears) {
     if (entriesOfYear.year === dateValue.year()) {
       for (const entry of entriesOfYear.entries) {
         if (getDate(entry.time) === getDate(dateValue)) {
           extend(entryValue, entry);
           timeValue.value = entry.time;
-          break;
+          return true;
         }
       }
-      break;
+      return false;
     }
   }
+  return false;
 };
 
 const dateValue = ref<Dayjs>(entryStore.dateValue);
@@ -60,7 +61,12 @@ watch(
   () => dateValue.value,
   (newValue) => {
     entryStore.changeDate(newValue);
-    changeEntryValue(newValue);
+    if (!changeEntryValue(newValue)) {
+      entryValue.emotion = 1;
+      timeValue.value = dayjs(getTime(timeNow), "HH:mm");
+      entryValue.title = "";
+      entryValue.content = "";
+    }
   },
 );
 
@@ -75,11 +81,10 @@ const getEmotionUrl = (emotion: number) => {
 
 // Handle create entry
 const createNewEntry = () => {
-  entryValue.emotion = 1;
-  timeValue.value = dayjs(getTime(timeNow), "HH:mm");
+  // when call entryStore.changeDate will change dateValue because watch(entryStore.dateValue),
+  // so watch(dateValue.value) will also be called
   entryStore.changeDate(dayjs(getDate(timeNow)));
-  entryValue.title = "";
-  entryValue.content = "";
+
   for (const entriesOfYear of entryStore.entriesOfYears) {
     if (entriesOfYear.year === entryStore.dateValue.year()) {
       for (const entry of entriesOfYear.entries) {
@@ -176,7 +181,7 @@ const handleBackToList = () => {
 
           <div class="flex justify-between flex-1">
             <a-button
-              v-if="isDesktop"
+              v-if="!isDesktop"
               class="font-bold lg:hidden"
               @click="handleBackToList"
             >

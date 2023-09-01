@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import dayjs, { Dayjs } from "dayjs";
 import { DeleteFilled, PlusOutlined } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
 
 import { Entry, Filter } from "../../../types";
 
@@ -39,6 +40,7 @@ const handleChecked = (checkedValue: any) => {
 const handleDeleteEntry = () => {
   entryStore.deleteEntry();
   deleteAmount = 0;
+  message.success("Delete successfully", 3);
 };
 
 // click create new entry button

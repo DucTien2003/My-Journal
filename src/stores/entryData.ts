@@ -7,6 +7,30 @@ import { EntriesOfYear, Entry } from "../../types";
 import { getDate, extend } from "@/utils";
 import { getEntriesOfYears } from "@/api";
 
+// sort and insert 1 element into entry list
+const binaryInsertEntry = (arr: any, element: any) => {
+  let left = 0;
+  let right = arr.length - 1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (arr[mid].year) {
+      if (arr[mid].year > element.year) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    } else if (arr[mid].time) {
+      if (arr[mid].time.isAfter(element.time)) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
+  }
+  arr.splice(left, 0, element);
+};
+
 export const useEntryStore = defineStore("entry-list", {
   state: () => ({
     dateValue: dayjs(getDate(dayjs())),
@@ -52,14 +76,14 @@ export const useEntryStore = defineStore("entry-list", {
             }
           }
           if (checkDate) {
+            binaryInsertEntry(entriesOfYear.entries, { ...entryValue });
             message.success("Save successfully!", 3);
-            entriesOfYear.entries.unshift({ ...entryValue });
           }
           break;
         }
       }
       if (checkYear) {
-        this.entriesOfYears.unshift({
+        binaryInsertEntry(this.entriesOfYears, {
           year: entryValue.time.year(),
           entries: [{ ...entryValue }],
         });
