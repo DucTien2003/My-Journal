@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import dayjs, { Dayjs } from "dayjs";
 import { message } from "ant-design-vue";
 
-import { EntriesOfYear, Entry } from "../../types";
+import { EntriesOfYear, Entry, Filter } from "../../types";
 
 import { getDate, extend } from "@/utils";
 import { getEntriesOfYears } from "@/api";
@@ -37,6 +37,39 @@ export const useEntryStore = defineStore("entry-list", {
     // Entries data
     entriesOfYears: getEntriesOfYears(),
   }),
+  getters: {
+    listFilter:
+      (state) =>
+      (date: Dayjs | undefined, filterType: Filter): EntriesOfYear[] => {
+        if (date === null || date === undefined) {
+          return state.entriesOfYears;
+        } else {
+          if (filterType === "") {
+            console.log("day day day");
+            return state.entriesOfYears.filter(
+              (entriesOfYear: EntriesOfYear) => {
+                for (const entry of entriesOfYear.entries) {
+                  return entry.time.isSame(date, "day");
+                }
+              },
+            );
+          } else if (filterType === "month" || filterType === "year") {
+            return state.entriesOfYears.filter(
+              (entriesOfYear: EntriesOfYear) => {
+                for (const entry of entriesOfYear.entries) {
+                  return (
+                    entry.time.isAfter(date.startOf(filterType)) &&
+                    entry.time.isBefore(date.endOf(filterType))
+                  );
+                }
+              },
+            );
+          } else {
+            return [];
+          }
+        }
+      },
+  },
   actions: {
     changeDate(date: Dayjs) {
       this.dateValue = date;

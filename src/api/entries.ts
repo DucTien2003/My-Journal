@@ -1,3 +1,4 @@
+import { EntriesOfYear } from "./../../types/entriesOfYear";
 import { reactive } from "vue";
 import dayjs from "dayjs";
 
@@ -64,7 +65,7 @@ const EntriesOfYears = reactive<RawEntriesOfYear[]>([
 ]);
 
 // Handle time string => Dayjs
-export const getEntriesOfYears = () => {
+export const getEntriesOfYears = (): EntriesOfYear[] => {
   return EntriesOfYears.map((entriesOfYear: RawEntriesOfYear) => {
     return {
       ...entriesOfYear,

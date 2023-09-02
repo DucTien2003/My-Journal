@@ -14,9 +14,12 @@ const entryStore = useEntryStore();
 // Filter
 const filterValue = ref<Dayjs>();
 const filter = ref<Filter>("");
-// const showTime = () => {
-//   console.log(filterValue.value);
-// };
+const showTime = () => {
+  if (filterValue.value) {
+    console.log(filter.value);
+    console.log(getDate(filterValue.value));
+  }
+};
 
 // Emotion
 const getEmotionUrl = (emotion: number) => {
@@ -62,6 +65,7 @@ const createNewEntry = () => {
           :picker="filter"
           class="w-40 lg:flex-1"
           :inputReadOnly="true"
+          @change="showTime"
         />
 
         <a-select
@@ -69,9 +73,7 @@ const createNewEntry = () => {
           class="w-24 ml-1"
         >
           <a-select-option value="">Day</a-select-option>
-          <a-select-option value="week">Week</a-select-option>
           <a-select-option value="month">Month</a-select-option>
-          <a-select-option value="quarter">Quarter</a-select-option>
           <a-select-option value="year">Year</a-select-option>
         </a-select>
       </div>
@@ -91,7 +93,10 @@ const createNewEntry = () => {
     <!-- Entry list -->
     <div class="entries mt-2 overflow-auto">
       <div
-        v-for="(entriesOfYear, indexEntriesOfYear) in entryStore.entriesOfYears"
+        v-for="(entriesOfYear, indexEntriesOfYear) in entryStore.listFilter(
+          filterValue,
+          filter,
+        )"
         :key="indexEntriesOfYear"
       >
         <a-divider orientation="left">

@@ -1,1 +1,1 @@
-export type Filter = "" | "week" | "month" | "quarter" | "year";
+export type Filter = "" | "month" | "year";
