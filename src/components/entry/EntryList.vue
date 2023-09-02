@@ -16,7 +16,6 @@ const filterValue = ref<Dayjs>();
 const filter = ref<Filter>("");
 const showTime = () => {
   if (filterValue.value) {
-    console.log(filter.value);
     console.log(getDate(filterValue.value));
   }
 };

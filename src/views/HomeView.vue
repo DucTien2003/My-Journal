@@ -1,7 +1,14 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
+
 import { isDesktop } from "@/utils";
 import EntryList from "@/components/entry/EntryList.vue";
 import EntryDetail from "@/components/entry/EntryDetail.vue";
+import { useEntryStore } from "@/stores";
+
+onMounted(async () => {
+  await useEntryStore().fetchEntriesOfYears();
+});
 </script>
 
 <template>

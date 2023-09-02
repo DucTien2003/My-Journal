@@ -31,11 +31,13 @@ const binaryInsertEntry = (arr: any, element: any) => {
   arr.splice(left, 0, element);
 };
 
+// getEntriesOfYears().then((data) => console.log(data));
+
 export const useEntryStore = defineStore("entry-list", {
   state: () => ({
-    dateValue: dayjs(getDate(dayjs())),
+    dateValue: dayjs(getDate(dayjs())) as Dayjs,
     // Entries data
-    entriesOfYears: getEntriesOfYears(),
+    entriesOfYears: [] as EntriesOfYear[],
   }),
   getters: {
     listFilter:
@@ -45,7 +47,6 @@ export const useEntryStore = defineStore("entry-list", {
           return state.entriesOfYears;
         } else {
           if (filterType === "") {
-            console.log("day day day");
             return state.entriesOfYears.filter(
               (entriesOfYear: EntriesOfYear) => {
                 for (const entry of entriesOfYear.entries) {
@@ -71,6 +72,9 @@ export const useEntryStore = defineStore("entry-list", {
       },
   },
   actions: {
+    fetchEntriesOfYears() {
+      getEntriesOfYears().then((data) => (this.entriesOfYears = data));
+    },
     changeDate(date: Dayjs) {
       this.dateValue = date;
     },
